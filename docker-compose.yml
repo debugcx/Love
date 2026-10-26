@@ -1,0 +1,36 @@
+# Love小家 · Docker 部署
+#
+# 用法：
+#   1. 复制 .env.example 为 .env，至少填写 NUXT_PUBLIC_SUPABASE_URL / NUXT_PUBLIC_SUPABASE_ANON_KEY
+#   2. docker compose up -d --build
+#   3. 访问 http://服务器IP:8080
+#
+# 注意：前端是纯静态构建，NUXT_PUBLIC_* 变量在构建期注入镜像。
+# 修改 .env 后需要重新执行 docker compose up -d --build 才会生效。
+#
+# 私密数据（照片、消息等）全部存放在 Supabase，不在本容器内。
+# 生产环境建议在本容器前再放一层 HTTPS 反向代理（Caddy / Traefik / 已有 nginx）。
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NUXT_PUBLIC_SUPABASE_URL: ${NUXT_PUBLIC_SUPABASE_URL:-}
+        NUXT_PUBLIC_SUPABASE_ANON_KEY: ${NUXT_PUBLIC_SUPABASE_ANON_KEY:-}
+        NUXT_PUBLIC_AMAP_KEY: ${NUXT_PUBLIC_AMAP_KEY:-}
+        NUXT_PUBLIC_AMAP_SECURITY_CODE: ${NUXT_PUBLIC_AMAP_SECURITY_CODE:-}
+        NUXT_PUBLIC_ZEGO_APP_ID: ${NUXT_PUBLIC_ZEGO_APP_ID:-}
+        NUXT_PUBLIC_ZEGO_APPSIGN: ${NUXT_PUBLIC_ZEGO_APPSIGN:-}
+        NUXT_PUBLIC_ZEGO_SERVER: ${NUXT_PUBLIC_ZEGO_SERVER:-}
+        NUXT_PUBLIC_TURN_URLS: ${NUXT_PUBLIC_TURN_URLS:-}
+        NUXT_PUBLIC_TURN_USERNAME: ${NUXT_PUBLIC_TURN_USERNAME:-}
+        NUXT_PUBLIC_TURN_CREDENTIAL: ${NUXT_PUBLIC_TURN_CREDENTIAL:-}
+        NUXT_PUBLIC_APP_VERSION: ${NUXT_PUBLIC_APP_VERSION:-}
+        NUXT_PUBLIC_UPDATE_MANIFEST_URL: ${NUXT_PUBLIC_UPDATE_MANIFEST_URL:-}
+    image: love-couplespace:latest
+    container_name: love-couplespace
+    ports:
+      - "8080:80"
+    restart: unless-stopped

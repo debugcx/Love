@@ -1,0 +1,31 @@
+# Git / 本地产物
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# 构建产物
+.nuxt
+.output
+.output-*
+dist
+desktop-dist
+
+# 依赖
+node_modules
+
+# 非 Web 部署所需目录
+android
+desktop
+tests
+docs
+infra
+supabase
+scripts
+.github
+
+# 编辑器
+.vscode
+.idea
+*.log

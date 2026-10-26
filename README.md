@@ -263,6 +263,15 @@ npm run desktop:exe
 
 Electron 桌面壳默认加载线上 Web 版本，因此网页业务更新不一定需要重新制作 EXE。安装包输出到 `desktop-dist/`。
 
+### Docker 部署（自托管服务器）
+
+```bash
+cp .env.example .env   # 填写 Supabase 地址与 anon key
+docker compose up -d --build
+```
+
+启动后访问 `http://服务器IP:8080`。适合把 Web 端部署到自己的服务器，配合 Supabase（云或自托管）使用，完整说明见 [docs/DOCKER_DEPLOY.md](docs/DOCKER_DEPLOY.md)。
+
 ### 版本更新
 
 版本号维护在 `package.json` 和 Nuxt runtime config 中。网页和桌面端使用在线更新清单，Android 通过 APK 下载入口提示用户安装新版本。完整流程见 [APP_UPDATE.md](APP_UPDATE.md)。
