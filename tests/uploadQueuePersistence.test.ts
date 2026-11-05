@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { restorePersistedJobs, restoredJobPatch } from '../app/utils/uploadQueuePersistence'
+import {
+  persistUploadJobs,
+  restorePersistedJobs,
+  restoredJobPatch,
+  uploadQueueStorageKey,
+} from '../app/utils/uploadQueuePersistence'
 
 describe('upload queue persistence', () => {
   it('restores unfinished jobs while preserving terminal failures', () => {
@@ -38,5 +43,32 @@ describe('upload queue persistence', () => {
       id: 'job-2',
       error: '浏览器未能恢复文件内容，请重新选择文件',
     })
+  })
+
+  it('writes unfinished jobs under the shared key and can restore them', () => {
+    const store = new Map<string, string>()
+    const storage = { setItem: (key: string, value: string) => { store.set(key, value) } }
+    persistUploadJobs(storage, [
+      { id: 'done', status: 'completed' },
+      { id: 'uploading', status: 'uploading', uppyFileId: 'uppy-1', name: 'a.jpg', size: 1, progress: 40, attempts: 1, error: '', createdAt: '2026-01-01T00:00:00.000Z' },
+      { id: 'failed', status: 'failed', name: 'b.mp4', size: 2, progress: 0, attempts: 3, error: '网络错误', createdAt: '2026-01-01T00:00:00.000Z' },
+    ])
+
+    const raw = store.get(uploadQueueStorageKey)
+    expect(raw).toBeTruthy()
+    const restored = restorePersistedJobs(raw || null)
+    expect(restored.map((job) => job.id)).toEqual(['uploading', 'failed'])
+    expect(restored[0]).toMatchObject({ id: 'uploading', status: 'paused', restored: true })
+    expect(restored[1]).toMatchObject({ id: 'failed', status: 'failed', error: '网络错误' })
+  })
+
+  it('keeps only the latest 30 unfinished jobs', () => {
+    const store = new Map<string, string>()
+    const storage = { setItem: (key: string, value: string) => { store.set(key, value) } }
+    persistUploadJobs(storage, Array.from({ length: 35 }, (_, i) => ({ id: `job-${i}`, status: 'queued' })))
+    const restored = restorePersistedJobs(store.get(uploadQueueStorageKey) || null)
+    expect(restored).toHaveLength(30)
+    expect(restored[0].id).toBe('job-5')
+    expect(restored[29].id).toBe('job-34')
   })
 })

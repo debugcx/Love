@@ -22,7 +22,7 @@ export function useCoupleAuth() {
   const { $supabase } = useNuxtApp()
   const configured = computed(() => Boolean($supabase))
 
-  async function loadMembership(userId: string, email: string) {
+  async function loadMembership(userId: string, email: string, options: { commitStage?: boolean } = {}) {
     if (!$supabase) return
     const { data: member } = await $supabase
       .from('couple_members')
@@ -37,7 +37,13 @@ export function useCoupleAuth() {
       displayName: user.value?.user_metadata?.display_name || email.split('@')[0],
       coupleId: memberData?.couple_id,
     }
-    stage.value = memberData?.couple_id ? 'paired' : 'unpaired'
+    // 创建空间后需要先展示邀请码，不能立刻切到 paired 把 AuthFlow 顶掉。
+    if (options.commitStage !== false) stage.value = memberData?.couple_id ? 'paired' : 'unpaired'
+  }
+
+  /** 用户在邀请码页点「先进入空间」后，才真正切换到已配对界面。 */
+  function enterCoupleSpace() {
+    if (profile.value?.coupleId) stage.value = 'paired'
   }
 
   async function initialize() {
@@ -144,7 +150,6 @@ export function useCoupleAuth() {
     try {
       if (!$supabase || demoMode.value) {
         profile.value = { ...profile.value!, coupleId: 'demo-couple', partnerName: '等待加入' }
-        stage.value = 'paired'
         return 'LOVE-7286'
       }
       const { data, error } = await $supabase.rpc('create_couple_with_invitation', {
@@ -152,7 +157,8 @@ export function useCoupleAuth() {
         relationship_start: relationshipStart,
       })
       if (error) throw error
-      await loadMembership(user.value!.id, user.value!.email || '')
+      // 只加载成员信息，不切换 stage：让创建者先看到并复制邀请码。
+      await loadMembership(user.value!.id, user.value!.email || '', { commitStage: false })
       return data as string
     } finally { loading.value = false }
   }
@@ -180,5 +186,5 @@ export function useCoupleAuth() {
     demoMode.value = false
   }
 
-  return { configured, demoMode, initialized, loading, profile, stage, initialize, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, updatePassword, createCouple, joinCouple, signOut }
+  return { configured, demoMode, initialized, loading, profile, stage, initialize, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, updatePassword, createCouple, enterCoupleSpace, joinCouple, signOut }
 }

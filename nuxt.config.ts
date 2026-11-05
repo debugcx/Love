@@ -42,12 +42,7 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      turnUrl: process.env.NUXT_PUBLIC_TURN_URL || '',
-      turnUrls: process.env.NUXT_PUBLIC_TURN_URLS || process.env.NUXT_PUBLIC_TURN_URL || '',
-      turnUsername: process.env.NUXT_PUBLIC_TURN_USERNAME || '',
-      turnCredential: process.env.NUXT_PUBLIC_TURN_CREDENTIAL || '',
       zegoAppId: process.env.NUXT_PUBLIC_ZEGO_APP_ID || '1962051148',
-      zegoAppSign: process.env.NUXT_PUBLIC_ZEGO_APPSIGN || '',
       zegoServer: process.env.NUXT_PUBLIC_ZEGO_SERVER || 'wss://webliveroom-api.zego.im/ws',
       amapKey: process.env.NUXT_PUBLIC_AMAP_KEY || '',
       amapSecurityCode: process.env.NUXT_PUBLIC_AMAP_SECURITY_CODE || '',

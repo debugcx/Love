@@ -10,7 +10,7 @@ const { profile } = useCoupleAuth()
 const { $supabase } = useNuxtApp()
 const { members, subscribeMembers } = useAccountManagement()
 const { messages, messagesLoading, messagesLoadingMore, messagesHasMore, loadMessages, loadOlderMessages, subscribe, send, recall, markRead, disconnect } = useMessages()
-const { callStatus, ensureChannel, startCall, hangUp } = useCoupleCall()
+const { callStatus, callError, ensureChannel, startCall, hangUp } = useCoupleCall()
 const { liveStatus, liveError, liveMuted, liveRemoteMuted, liveRemoteName, liveNeedsGesture, ensureLiveChannel, startLive, stopLive, dismissLive, toggleLiveMute, resumeLiveAudio } = useCoupleLiveMic()
 const text = ref('')
 const file = ref<File | null>(null)
@@ -180,6 +180,7 @@ async function submit() {
         <button v-else type="button" title="停止收听" @click="dismissLive"><VolumeX :size="17" /></button>
       </div>
       <p v-if="liveError" class="live-mic-error">{{ liveError }}</p>
+      <p v-if="callError" class="live-mic-error call-error">{{ callError }} <button type="button" @click="callError = ''">知道了</button></p>
       <div ref="scrollArea" class="message-area" @scroll.passive="handleMessageScroll">
         <div v-if="messagesLoading" class="chat-state"><LoaderCircle class="spin" :size="24" />正在加载你们的悄悄话</div>
         <div v-else-if="messagesLoadingMore" class="history-loading"><LoaderCircle class="spin" :size="14"/>正在加载更早的悄悄话</div>
@@ -254,7 +255,7 @@ form{position:relative;z-index:2;padding:12px 16px 15px;border-top:1px solid rgb
 <style scoped>
 @media(max-width:650px){.is-drawer .chat-panel{height:100dvh;padding-top:env(safe-area-inset-top)}.chat-panel>header{padding-top:max(15px,env(safe-area-inset-top))}.is-page .chat-panel{height:calc(100dvh - 106px)}.partner-copy strong{font-size:13px}.bubble p{font-size:12px}}
 .history-loading{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;color:#9a849e;font-size:10px}
-.live-button{color:#9c4a87!important}.live-button.active{background:linear-gradient(135deg,#9b55c6,#e36f9f)!important;color:#fff!important;box-shadow:0 8px 18px rgba(157,72,150,.25)!important}.live-mic-banner{position:relative;z-index:3;display:flex;align-items:center;gap:10px;margin:0 18px 8px;padding:10px 12px;border:1px solid rgba(215,151,196,.26);border-radius:17px;background:linear-gradient(120deg,rgba(244,224,251,.88),rgba(255,224,237,.88));box-shadow:0 8px 20px rgba(104,57,118,.08)}.live-mic-banner.broadcasting{background:linear-gradient(120deg,rgba(226,205,253,.92),rgba(255,211,232,.9))}.live-mic-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:11px;background:rgba(255,255,255,.72);color:#a34e94}.live-mic-banner>div{min-width:0;flex:1}.live-mic-banner strong,.live-mic-banner small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-mic-banner strong{color:#633a6f;font-size:12px}.live-mic-banner small{margin-top:3px;color:#977b9e;font-size:10px}.live-mic-banner>button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:10px;background:rgba(255,255,255,.68);color:#7b4a86;cursor:pointer}.live-mic-error{position:relative;z-index:3;margin:-1px 20px 8px;color:#b64f76;font-size:10px}
+.live-button{color:#9c4a87!important}.live-button.active{background:linear-gradient(135deg,#9b55c6,#e36f9f)!important;color:#fff!important;box-shadow:0 8px 18px rgba(157,72,150,.25)!important}.live-mic-banner{position:relative;z-index:3;display:flex;align-items:center;gap:10px;margin:0 18px 8px;padding:10px 12px;border:1px solid rgba(215,151,196,.26);border-radius:17px;background:linear-gradient(120deg,rgba(244,224,251,.88),rgba(255,224,237,.88));box-shadow:0 8px 20px rgba(104,57,118,.08)}.live-mic-banner.broadcasting{background:linear-gradient(120deg,rgba(226,205,253,.92),rgba(255,211,232,.9))}.live-mic-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:11px;background:rgba(255,255,255,.72);color:#a34e94}.live-mic-banner>div{min-width:0;flex:1}.live-mic-banner strong,.live-mic-banner small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-mic-banner strong{color:#633a6f;font-size:12px}.live-mic-banner small{margin-top:3px;color:#977b9e;font-size:10px}.live-mic-banner>button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:10px;background:rgba(255,255,255,.68);color:#7b4a86;cursor:pointer}.live-mic-error{position:relative;z-index:3;margin:-1px 20px 8px;color:#b64f76;font-size:10px}.call-error button{margin-left:6px;padding:0;border:0;background:none;color:#8b3f91;font-size:10px;text-decoration:underline;cursor:pointer}
 .call-avatar{overflow:hidden}.call-avatar img{width:100%;height:100%;object-fit:cover}
 @media(max-width:650px){.live-mic-banner{margin:0 12px 7px;padding:9px 10px}.live-mic-banner strong{font-size:11px}.live-mic-banner small{font-size:9px}.live-button{display:grid!important}.chat-panel>header .partner-avatar{width:44px;height:44px;min-width:44px;flex-basis:44px}}
 </style>

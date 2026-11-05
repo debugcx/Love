@@ -26,8 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: TypeScript check
-        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+
+      # 根 tsconfig 是 files:[] + references，`tsc --noEmit` 不会检查任何文件。
+      # 这里跑真实的 app 配置；当前仍有存量类型错误，先保证可见，修完后去掉 continue-on-error。
+      - name: TypeScript check (known debt, non-blocking)
+        run: npx tsc -p .nuxt/tsconfig.app.json --noEmit
+        continue-on-error: true
 
       - name: Generate production site
         run: npm run generate

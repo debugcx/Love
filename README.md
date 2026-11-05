@@ -199,11 +199,24 @@ NUXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 - `NUXT_PUBLIC_AMAP_SECURITY_CODE`：高德安全密钥。
 - `NUXT_PUBLIC_ZEGO_APP_ID`：ZEGO App ID。
 - `NUXT_PUBLIC_ZEGO_SERVER`：ZEGO WebSocket 服务地址。
-- `NUXT_PUBLIC_TURN_URLS`、`NUXT_PUBLIC_TURN_USERNAME`、`NUXT_PUBLIC_TURN_CREDENTIAL`：WebRTC 中继配置。
 
 ### 3. 初始化 Supabase
 
-将 `supabase/migrations/` 中的迁移应用到自己的 Supabase 项目。使用 Supabase CLI 时可以：
+> **全新项目不要直接执行 `db push`。** 迁移 `002` 起依赖 `setup.sql` 里的 `couples` /
+> `profiles` / `is_couple_member`，`006` 依赖 `messages.media_type`，`007` 依赖
+> `couple_letters`；这些基础对象不在 `migrations/` 中，直接推送会在 006 前后失败。
+
+先在 Supabase SQL Editor 执行一次 `supabase/bootstrap.sql`（基础表、Storage bucket、
+RPC 与策略，可重复执行）：
+
+```text
+supabase/bootstrap.sql
+```
+
+该文件由 `supabase/setup*.sql`、`supabase/upgrade*.sql` 按依赖顺序生成。修改这些源文件后，
+用 `npm run supabase:bootstrap` 重新生成，不要手工编辑 `bootstrap.sql`。
+
+基础对象就绪后，再把增量迁移应用到项目：
 
 ```bash
 npx supabase login
@@ -215,7 +228,10 @@ npx supabase db push
 
 ```bash
 npx supabase functions deploy account-auth
+npx supabase functions deploy account-security
 npx supabase functions deploy heart-ai
+npx supabase functions deploy send-call-push
+npx supabase functions deploy turn-credentials
 npx supabase functions deploy zego-token
 ```
 

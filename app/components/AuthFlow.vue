@@ -4,7 +4,7 @@ import './auth-single-card.css'
 import { ArrowLeft, Check, Copy, Heart, KeyRound, Link2, LoaderCircle, Mail, ShieldCheck, Sparkles, UserRound } from '@lucide/vue'
 
 const emit = defineEmits<{ complete: [] }>()
-const { configured, demoMode, loading, profile, stage, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, createCouple, joinCouple } = useCoupleAuth()
+const { configured, demoMode, loading, profile, stage, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, createCouple, enterCoupleSpace, joinCouple } = useCoupleAuth()
 const mode = ref<'login' | 'register'>('login')
 const loginType = ref<'email' | 'account'>('email')
 const recovering = ref(false)
@@ -160,7 +160,7 @@ async function resendEmail() {
           <span class="success-icon"><Check :size="24" /></span><h3>空间创建好了</h3><p>把下面的邀请码发给另一半，有效期为 7 天。</p>
           <button class="code-box" type="button" @click="copyCode"><strong>{{ generatedCode }}</strong><Copy :size="18" /></button>
           <small>{{ copied ? '已复制到剪贴板' : '点击复制邀请码' }}</small>
-          <button class="auth-submit" type="button" @click="emit('complete')">先进入空间</button>
+          <button class="auth-submit" type="button" @click="enterCoupleSpace(); emit('complete')">先进入空间</button>
         </div>
         <form v-else class="auth-form" @submit.prevent="submitJoin">
           <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="12" placeholder="例如 LOVE-7286"></div></label>

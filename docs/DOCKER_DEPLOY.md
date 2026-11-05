@@ -41,7 +41,6 @@ docker compose up -d --build
 | `NUXT_PUBLIC_SUPABASE_ANON_KEY` | 是 | Supabase anon key（公开密钥，安全依赖 RLS 策略） |
 | `NUXT_PUBLIC_AMAP_KEY` / `NUXT_PUBLIC_AMAP_SECURITY_CODE` | 否 | 高德地图，启用位置消息与实时地图 |
 | `NUXT_PUBLIC_ZEGO_APP_ID` / `NUXT_PUBLIC_ZEGO_SERVER` | 否 | ZEGO 即构，启用语音/视频通话 |
-| `NUXT_PUBLIC_TURN_URLS` / `NUXT_PUBLIC_TURN_USERNAME` / `NUXT_PUBLIC_TURN_CREDENTIAL` | 否 | WebRTC TURN 中继，弱网通话质量 |
 | `NUXT_PUBLIC_APP_VERSION` / `NUXT_PUBLIC_UPDATE_MANIFEST_URL` | 否 | 版本号与更新清单地址 |
 
 **重要：这些变量全部在构建期注入**。`npm run generate` 产出的是纯静态文件，运行时不再读取环境变量，所以：

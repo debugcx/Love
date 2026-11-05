@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "supabase:bootstrap": "node scripts/build-supabase-bootstrap.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {

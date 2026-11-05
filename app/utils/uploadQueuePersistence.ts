@@ -14,6 +14,18 @@ export type PersistedUploadJob = {
 
 export const uploadQueueStorageKey = 'couple-space-upload-queue-v2'
 
+/**
+ * 把未完成任务写回 localStorage。调用方不要再自己拼 key，避免键名漂移
+ * 或拼错后把异常吞掉、导致刷新后队列静默丢失。
+ */
+export function persistUploadJobs<T extends { status: string }>(
+  storage: Pick<Storage, 'setItem'>,
+  jobs: T[],
+): void {
+  const pending = jobs.filter(job => job.status !== 'completed').slice(-30)
+  storage.setItem(uploadQueueStorageKey, JSON.stringify(pending))
+}
+
 export function restorePersistedJobs(raw: string | null): PersistedUploadJob[] {
   if (!raw) return []
   try {

@@ -1,6 +1,6 @@
 import Uppy from '@uppy/core'
 import GoldenRetriever from '@uppy/golden-retriever'
-import { restorePersistedJobs, restoredJobPatch, uploadQueueStorageKey } from '~/utils/uploadQueuePersistence'
+import { persistUploadJobs, restorePersistedJobs, restoredJobPatch, uploadQueueStorageKey } from '~/utils/uploadQueuePersistence'
 
 export type UploadJobStatus = 'queued' | 'uploading' | 'retrying' | 'paused' | 'completed' | 'failed'
 export type UploadOperation = {
@@ -37,7 +37,7 @@ let uppy: Uppy | null = null
 function persist() {
   if (!import.meta.client) return
   try {
-    localStorage.setItem(queueStorageKey, JSON.stringify(jobs.value.filter(job => job.status !== 'completed').slice(-30)))
+    persistUploadJobs(localStorage, jobs.value)
   } catch { /* best effort */ }
 }
 
